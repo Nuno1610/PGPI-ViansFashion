@@ -1,0 +1,40 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Navbar estilizada */
+.nav-link {
+  transition: 0.2s;
+}
+
+.nav-link:hover {
+  color: #b208dd !important;
+  transform: translateY(-2px);
+}
+
+.navbar-brand:hover{
+  color: #b208dd !important;
+  transform: translateY(-2px);
+}
+
+section {
+  background: linear-gradient(180deg, #fff, #f7f7f7);
+}
+
+/* Barra de búsqueda superior */
+.search-bar-top { margin-bottom:32px; padding:24px 0; }
+.search-form-top { display:flex; justify-content:center; width:100%; }
+.search-input-wrap-top { display:flex; gap:10px; max-width:550px; width:100%; }
+.search-input-top { flex:1; padding:14px 20px; border-radius:28px; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-size:1.05rem; font-family:inherit; }
+.search-input-top:focus { border-color: #3bc6b3; box-shadow: 0 2px 12px rgba(59, 198, 179, 0.2);}
+.search-button-top { background:#3bc6b3; color:#fff; border:none; padding:14px 28px; border-radius:26px; cursor:pointer; font-weight:600; white-space:nowrap; box-shadow:0 2px 6px rgba(59,198,179,0.3); transition:all 0.3s ease; }
+.search-button-top:hover { background:#2aad9c; box-shadow:0 4px 12px rgba(59,198,179,0.4); }
+.reset-button-top { padding:14px 20px; color:#666; text-decoration:none; border-radius:24px; white-space:nowrap; transition:all 0.3s ease; }
+.reset-button-top:hover { background:#f5f5f5; color:#333; }
+
+/* Estilos de la barra de búsqueda */
+.search-bar { margin-bottom:18px; }
+.search-input-wrap { display:flex; gap:8px; }
+.search-input { flex:1; padding:10px 14px; border-radius:24px; border:1px solid #ddd; box-shadow:0 1px 3px rgba(0,0,0,0.04); font-size:1rem; }
+.search-button { background:#3bc6b3; color:#fff; border:none; padding:10px 16px; border-radius:20px; cursor:pointer; }
+

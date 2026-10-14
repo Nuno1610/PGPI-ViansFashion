@@ -1,0 +1,71 @@
+/* Contenedor del formulario */
+.form-container {
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 25px 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Encabezado */
+.form-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.5em;
+}
+
+/* Campos del formulario */
+.form-container form input[type="text"],
+.form-container form textarea,
+.form-container form input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.2);
+    font-size: 1em;
+    background: rgba(255,255,255,0.2);
+    color: #000;
+}
+
+/* Textarea */
+.form-container form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Botón de submit */
+.form-container form button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    background: #28a745;
+    color: white;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.form-container form button[type="submit"]:hover {
+    background: #218838;
+}
+
+/* Mensajes de error / éxito */
+.form-container .messages {
+    margin-bottom: 15px;
+    font-size: 0.9em;
+}
+
+.form-container .messages .error {
+    color: #e74c3c;
+}
+
+.form-container .messages .success {
+    color: #4CAF50;
+}

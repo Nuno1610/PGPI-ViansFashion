@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- Número del pedido -->
+    <h2 class="fw-bold mb-4">Detalles del pedido</h2>
+
+    <div class="mb-3">
+        <span class="text-muted">Pedido:</span>
+        <span class="fw-semibold">{{ pedido.numero_pedido }}</span>
+    </div>
+
+    <!-- Info principal -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <!-- Fecha -->
+            <p class="mb-2">
+                <strong>Fecha del pedido:</strong> 
+                {{ pedido.fecha_creacion|date:"d/m/Y" }}
+            </p>
+
+            <!-- Estado -->
+            <p class="mb-2">
+                <strong>Estado:</strong>
+                {% if request.user.is_superuser %}
+                    <form method="post" action="{% url 'cambiar_estado_pedido' pedido.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <select name="nuevo_estado" class="form-select form-select-sm d-inline w-auto">
+                            <option value="ENRV" {% if pedido.estado == "ENRV" %}selected{% endif %}>En revisión</option>
+                            <option value="PROC" {% if pedido.estado == "PROC" %}selected{% endif %}>Procesando</option>
+                            <option value="ENVI" {% if pedido.estado == "ENVI" %}selected{% endif %}>Enviado</option>
+                            <option value="ENTR" {% if pedido.estado == "ENTR" %}selected{% endif %}>Entregado</option>
+                            <option value="CANC" {% if pedido.estado == "CANC" %}selected{% endif %}>Cancelado</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-success">Actualizar</button>
+                    </form>
+                {% else %}
+                    {% if pedido.estado == "ENRV" %}
+                        <span class="badge bg-secondary">En revisión</span>
+                    {% elif pedido.estado == "PROC" %}
+                        <span class="badge bg-warning text-dark">Procesando</span>
+                    {% elif pedido.estado == "ENVI" %}
+                        <span class="badge bg-info text-dark">Enviado</span>
+                    {% elif pedido.estado == "ENTR" %}
+                        <span class="badge bg-success">Entregado</span>
+                    {% elif pedido.estado == "CANC" %}
+                        <span class="badge bg-danger">Cancelado</span>
+                    {% endif %}
+                {% endif %}
+            </p>
+
+        </div>
+    </div>
+
+    <!-- Productos del pedido -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">Productos del pedido</h5>
+
+            {% for item in items %}
+            <div class="row align-items-center border-bottom py-3">
+
+                <!-- Imagen producto -->
+                <div class="col-3 col-md-2">
+                    {% if item.producto.es_personalizado %}
+                        {% if item.personalizacion.imagen_generada %}
+                            <img src="{{ item.personalizacion.imagen_generada.url }}" style="max-width:150px;">
+                        {% endif %}
+                    {% else %}
+                    <img src="{{ item.producto.imagen_principal.url }}" alt="{{ item.producto.nombre }}"
+                         class="img-fluid rounded shadow-sm">
+                    {% endif %}
+                </div>
+
+                <div class="col-9 col-md-10">
+
+                    <!-- Nombre -->
+                    <p class="fw-semibold mb-1">{{ item.producto.nombre }}</p>
+
+                    <!-- Talla -->
+                    <p class="mb-1 text-muted">Talla: {{ item.talla.talla }}</p>
+
+                    <!-- Cantidad -->
+                    <p class="mb-1">Cantidad: {{ item.cantidad }}</p>
+
+                    <!-- Subtotal -->
+                    <p class="fw-semibold">Subtotal: {{ item.total|floatformat:2 }} €</p>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <!-- Total -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body text-end">
+            <h5 class="fw-bold">Total del pedido: {{ pedido.total }} €</h5>
+        </div>
+    </div>
+
+    <!-- Botón de seguimiento -->
+    <div class="text-end mb-5">
+        <a href="{% url 'seguimiento_pedido' pedido.numero_pedido %}" class="btn btn-primary">
+            Seguimiento del pedido
+        </a>
+    </div>
+
+</div>
+{% endblock %}

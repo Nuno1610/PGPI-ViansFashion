@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/formulario_marcas.css' %}">
+
+<div class="marca-form-container">
+    <h2>{{ accion }} Marca</h2>
+
+    {% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <fieldset class="marca-form-section">
+        <legend>Datos de la marca</legend>
+        
+        <!-- Nombre -->
+        <p>
+            {{ form.nombre.label_tag }}
+            {{ form.nombre }}
+            {% if form.nombre.errors %}
+            <span class="error">{{ form.nombre.errors }}</span>
+            {% endif %}
+        </p>
+
+        <!-- Imagen actual (solo en edición) -->
+        {% if marca and marca.imagen %}
+            <div class="imagen-actual">
+            <label>Logo actual:</label>
+            <div class="imagen-preview">
+                <img src="{{ marca.imagen.url }}" alt="{{ marca.nombre }}">
+            </div>
+            <p style="font-size: 0.9em; color: #666; margin-top: 5px;">
+                Sube una nueva imagen para reemplazarla
+            </p>
+            </div>
+        {% endif %}
+
+        <!-- Campo de imagen -->
+        <p>
+            {{ form.imagen.label_tag }}
+            {{ form.imagen }}
+            {% if form.imagen.errors %}
+            <span class="error">{{ form.imagen.errors }}</span>
+            {% endif %}
+            <span style="font-size: 0.85em; color: #666; display: block; margin-top: 5px;">
+            Formatos recomendados: PNG o SVG con fondo transparente
+            </span>
+        </p>
+        </fieldset>
+
+        <div class="marca-form-buttons">
+            <button type="submit" class="btn-primary">{{ accion }} Marca</button>
+            <a href="{% url 'catalogo' %}" class="btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

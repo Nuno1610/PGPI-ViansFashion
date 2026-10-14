@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Inicia sesión en Vians Fashion</h2>
+
+  <form method="post" action="{% url 'iniciar_sesion' %}" class="mx-auto" style="max-width: 500px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary w-100">Iniciar sesión</button>
+  </form>
+</div>
+{% endblock %}
+
+

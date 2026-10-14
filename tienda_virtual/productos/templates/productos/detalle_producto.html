@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/detalle_producto.css' %}">
+
+<div class="producto-detalle-container">
+
+  <!-- COLUMNA IZQUIERDA (IMÁGENES) -->
+  <div class="imagen-section">
+
+    <!-- IMAGEN PRINCIPAL -->
+    <img id="imagen-principal" src="{{ producto.imagen_principal.url }}" class="producto-detalle-img">
+
+    <!-- MINIATURAS -->
+    <div class="miniaturas-container">
+      {% for img in producto.imagenes.all %}
+        <img 
+          class="miniatura {% if forloop.first %}active{% endif %}" 
+          src="{{ img.imagen.url }}" 
+          data-full="{{ img.imagen.url }}"
+        >
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <!-- COLUMNA DERECHA (INFO) -->
+  <div class="info-section">
+    <h2>{{ producto.nombre }}</h2>
+    <p class="precio">{{ producto.precio }} €</p>
+    <p class="descripcion">{{ producto.descripcion }}</p>
+
+    <!-- SELECTOR DE TALLA PARA COMPRA-->
+    {% if not user.is_staff %}
+        {% if producto.stock_total > 0 %}
+            <label for="talla">Talla:</label>
+            <select id="talla" class="selector-talla">
+                {% for t in tallas %}
+                    <option 
+                        value="{{ t.id }}" 
+                        {% if t.stock == 0 %}disabled class="sin-stock"{% endif %}
+                    >
+                        {{ t.talla }} — 
+                        {% if t.stock > 0 %}
+                            En stock
+                        {% else %}
+                            Sin stock
+                        {% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        {% endif %}
+    {% endif %}
+
+
+
+    <!-- AÑADIR AL CARRITO -->
+    {% if not user.is_staff %}
+        {% if producto.stock_total > 0 %}
+            <form action="{% url 'agregar_producto_cesta' producto.id %}" method="POST" class="form-carrito">
+                {% csrf_token %}
+                <input type="hidden" name="talla_id" id="talla_id">
+
+                <label for="cantidad">Cantidad:</label>
+                <input type="number" id="cantidad" name="cantidad" min="1" value="1" class="cantidad-input">
+
+                <button type="submit" class="btn-carrito">Añadir al carrito</button>
+            </form>
+        {% else %}
+            <div class="sin-stock-mensaje">
+                <p>Producto agotado</p>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {% if user.is_staff %}
+        <div class="admin-actions">
+            <form method="post" action="{% url 'reponer_stock' producto.id %}">
+                {% csrf_token %}
+                <label for="talla-reponer">Talla:</label>
+                <select id="talla-reponer" name="talla_id">
+                    {% for t in tallas %}
+                        <option value="{{ t.id }}">
+                            {{ t.talla }} — {{ t.stock }} en stock
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="cantidad-reponer">Cantidad a reponer:</label>
+                <input type="number" id="cantidad-reponer" name="cantidad" min="1" value="1">
+
+                <button type="submit" class="btn-admin mt-2">Reponer stock</button>
+            </form>
+
+            <a href="{% url 'editar_producto_admin' producto.id %}" class="btn btn-warning mt-2">
+                Editar producto
+            </a>
+
+            <form method="post" action="{% url 'eliminar_producto' producto.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-admin btn-danger mt-2 mb-2">Eliminar producto</button>
+            </form>
+        </div>
+    {% endif %}
+
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // --- Selector de talla ---
+    const selector = document.getElementById("talla");
+    if (selector) {
+        const hiddenField = document.getElementById("talla_id");
+        hiddenField.value = selector.value;
+        selector.addEventListener("change", () => {
+            hiddenField.value = selector.value;
+        });
+    }
+
+    // --- Miniaturas clickables ---
+    const principal = document.getElementById("imagen-principal");
+    const minis = document.querySelectorAll(".miniatura");
+
+    if (principal && minis.length > 0) {
+        minis.forEach(mini => {
+            mini.addEventListener("click", () => {
+                // Cambiar la imagen principal al src de la miniatura
+                principal.src = mini.src;
+
+                // Cambiar clase active
+                minis.forEach(m => m.classList.remove("active"));
+                mini.classList.add("active");
+
+                // Añadir feedback visual (opcional)
+                mini.style.transform = "scale(1.05)";
+                setTimeout(() => {
+                    mini.style.transform = "";
+                }, 200);
+            });
+
+            // Hacer cursor pointer en las miniaturas
+            mini.style.cursor = "pointer";
+        });
+    }
+  });
+</script>
+
+{% endblock %}

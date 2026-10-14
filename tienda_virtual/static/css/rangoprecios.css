@@ -1,0 +1,53 @@
+/* Estilos para slider tipo imagen: barra azul con asas blancas cuadradas, cajas de valor */
+.liquid-glass-slider { position: relative; width: 100%; padding: 8px 0 0 0; }
+.liquid-glass-slider .track-container { position: relative; height: 8px; background: rgba(0,0,0,0.03); border-radius: 6px; }
+.liquid-glass-slider .range-fill { position: absolute; height: 100%; left: 0; width: 0; background: #3bc6b3; border-radius: 6px; }
+
+/* Dos inputs superpuestos; transparentes salvo el thumb */
+.liquid-glass-slider input[type=range] { -webkit-appearance:none; appearance:none; position:absolute; left:0; top:0; width:100%; height:100%; background:transparent; pointer-events:none; }
+.liquid-glass-slider input[type=range].active { pointer-events:auto; }
+.liquid-glass-slider input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:22px; height:22px; border-radius:6px; background:#fff; border:2px solid #e6e6e6; margin-top:-7px; cursor:pointer; }
+.liquid-glass-slider input[type=range]::-moz-range-thumb { width:22px; height:22px; border-radius:6px; background:#fff; border:2px solid #e6e6e6; cursor:pointer; }
+
+.price-values { display:flex; gap:12px; align-items:center; margin-bottom:8px; }
+.price-box { flex:1; text-align:center; border:1px solid #e6e6e6; border-radius:8px; padding:12px 8px; background:#fff; font-size:1rem; }
+.price-box .amount { font-weight:600; }
+.price-dash { color:#666; }
+
+/* Superposición para que el thumb máximo esté encima del mínimo */
+.liquid-glass-slider input[type=range]#precio-max-range { z-index:3; }
+.liquid-glass-slider input[type=range]#precio-min-range { z-index:2; }
+
+@media (max-width:480px) { .price-box{ padding:10px 6px; font-size:.95rem } }
+
+/* Layout del catálogo: columna de filtros a la izquierda y área principal para búsqueda + productos */
+.catalogo-container { display: block; }
+.catalog-layout { display: grid; grid-template-columns: 260px 1fr; gap: 24px; align-items: start; }
+.filters-column { grid-column: 1; width: 260px; }
+.filters-form { display: flex; flex-direction: column; }
+.filter-box { background:#e8e6e6; border:1px solid #e0e0e0; padding:12px; margin-bottom:14px; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.05); }
+.filter-box h3 { margin:0 0 10px 0; font-size:1.05rem; }
+.filter-button { background:#3bc6b3; color:#fff; border:none; padding:10px 16px; border-radius:20px; cursor:pointer; font-weight:600; margin-top:8px; width:100%; transition:all 0.3s ease; box-shadow:0 2px 4px rgba(59,198,179,0.2); }
+.filter-button:hover { background:#2aad9c; box-shadow:0 4px 8px rgba(59,198,179,0.3); }
+.catalog-main { grid-column: 2; }
+
+/* Barra de búsqueda superior (centrada en la parte superior) */
+.search-bar-top { margin-bottom:32px; padding:24px 0; }
+.search-form-top { display:flex; justify-content:center; width:100%; }
+.search-input-wrap-top { display:flex; gap:10px; max-width:550px; width:100%; }
+.search-input-top { flex:1; padding:14px 20px; border-radius:28px; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-size:1.05rem; font-family:inherit; }
+.search-button-top { background:#3bc6b3; color:#fff; border:none; padding:14px 28px; border-radius:26px; cursor:pointer; font-weight:600; white-space:nowrap; box-shadow:0 2px 6px rgba(59,198,179,0.3); transition:all 0.3s ease; }
+.search-button-top:hover { background:#2aad9c; box-shadow:0 4px 12px rgba(59,198,179,0.4); }
+.reset-button-top { padding:14px 20px; color:#666; text-decoration:none; border-radius:24px; white-space:nowrap; transition:all 0.3s ease; }
+.reset-button-top:hover { background:#f5f5f5; color:#333; }
+
+/* Estilos de la barra de búsqueda */
+.search-bar { margin-bottom:18px; }
+.search-input-wrap { display:flex; gap:8px; }
+.search-input { flex:1; padding:10px 14px; border-radius:24px; border:1px solid #ddd; box-shadow:0 1px 3px rgba(0,0,0,0.04); font-size:1rem; }
+.search-button { background:#3bc6b3; color:#fff; border:none; padding:10px 16px; border-radius:20px; cursor:pointer; }
+
+/* Hacer los sliders más altos para facilitar el toque */
+.liquid-glass-slider .track-container { height:10px; }
+.liquid-glass-slider input[type=range]::-webkit-slider-thumb { width:20px; height:20px; margin-top:-6px; }
+.liquid-glass-slider input[type=range]::-moz-range-thumb { width:20px; height:20px; }

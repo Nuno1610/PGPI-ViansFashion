@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+
+<div class="container mt-4">
+    <h2 class="mb-4">Finalizar compra</h2>
+    <div class="row">
+
+        <!-- Columna del formulario -->
+        <div class="col-md-7">
+            <div class="card shadow-sm p-4 mb-4">
+                 <!-- Vuelta al paso anteriror -->
+                <div class="back-arrow-container">
+                    <a href="javascript:history.back()" class="back-arrow">←</a>
+                </div>
+                {% if not show_payment %}
+                <!-- Paso 1: formulario de envío -->
+                <h4 class="mb-3">Datos de envío</h4>
+                <form method="post" action="{% url 'crear_pedido' %}">
+                    {% csrf_token %}
+                    <div class="mb-3"><label>Nombre completo</label>
+                        <input type="text" name="nombre" class="form-control" required></div>
+                    <div class="mb-3"><label>Dirección</label>
+                        <input type="text" name="direccion" class="form-control" required></div>
+                    <div class="mb-3"><label>Ciudad</label>
+                        <input type="text" name="ciudad" class="form-control" required></div>
+                    <div class="mb-3"><label>Código postal</label>
+                        <input type="text" name="cp" class="form-control" pattern="\d{5}" minlength="5" maxlength="5" inputmode="numeric" title="Introduce 5 dígitos" required></div>
+                    <div class="mb-3"><label>Correo electrónico</label>
+                        <input type="email" name="email" class="form-control" required></div>
+                    <div class="mb-3"><label>Teléfono</label>
+                        <input type="tel" name="telefono" class="form-control" pattern="\d{9}" minlength="9" maxlength="9" inputmode="tel" title="Introduce 9 dígitos" required></div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Continuar al pago</button>
+                </form>
+
+                {% else %}
+                <!-- Paso 2: PaymentElement de Stripe -->
+                <h4 class="mb-3">Método de pago</h4>
+                <form id="checkout-form">
+                    <div id="payment-element" class="mb-3"></div>
+                    <input type="hidden" name="payment_intent_id" value="{{ pedido.stripe_payment_intent }}">
+                    <button type="submit" class="btn btn-success btn-lg w-100 mt-2">Confirmar pago</button>
+                </form>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- Columna del resumen -->
+        <div class="col-md-5">
+            <div class="card shadow-sm p-4">
+                <h4 class="mb-3">Resumen del pedido</h4>
+                <ul class="list-group mb-3">
+                    {% if show_payment %}
+                        {% for item in pedido.items.all %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div>{{ item.producto.nombre }}{% if item.talla %} ({{ item.talla }}){% endif %} (x{{ item.cantidad }})</div>
+                                <span>{{ item.precio_unitario|floatformat:2 }} €</span>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        {% for item in items %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div>{{ item.nombre }}{% if item.talla %} ({{ item.talla.talla }}){% endif %} (x{{ item.cantidad }})</div>
+                                <span>{{ item.subtotal|floatformat:2 }} €</span>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <h4 class="text-center">
+                    Total: <strong>
+                    {% if show_payment %}{{ pedido.total|floatformat:2 }}{% else %}{{ total|floatformat:2 }}{% endif %} €
+                    </strong>
+                </h4>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% if show_payment %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+const stripe = Stripe("{{ stripe_public_key }}");
+const elements = stripe.elements({clientSecret: "{{ client_secret }}"});
+const paymentElement = elements.create("payment", {
+    setup_future_usage: null
+});
+paymentElement.mount("#payment-element");
+
+const form = document.getElementById("checkout-form");
+
+const submitButton = form.querySelector("button[type='submit']");
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitButton.style.display = 'none';
+
+    const processingMessage = document.createElement('div');
+    processingMessage.textContent = "Procesando pago, por favor espera...";
+    processingMessage.classList.add("text-center", "mb-3");
+    submitButton.parentNode.insertBefore(processingMessage, submitButton);
+
+    const {error} = await stripe.confirmPayment({
+        elements,
+        confirmParams: { return_url: "{{ success_url }}" }
+    });
+    if (error) {
+        alert(error.message);
+        // Si hay error, volvemos a mostrar el botón
+        submitButton.style.display = 'block';
+        processingMessage.remove();
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

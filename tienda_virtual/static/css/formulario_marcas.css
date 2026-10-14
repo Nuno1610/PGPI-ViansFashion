@@ -1,0 +1,238 @@
+/* Contenedor del formulario de marca */
+.marca-form-container {
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 25px 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Encabezado */
+.marca-form-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.5em;
+    color: #333;
+}
+
+/* Sección del formulario */
+.marca-form-section {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px);
+}
+
+.marca-form-section legend {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+    padding: 0 10px;
+}
+
+/* Labels */
+.marca-form-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+    font-size: 0.95em;
+}
+
+/* Campos del formulario */
+.marca-form-container input[type="text"],
+.marca-form-container input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.2);
+    font-size: 1em;
+    background: rgba(255,255,255,0.5);
+    color: #000;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.marca-form-container input[type="text"]:focus,
+.marca-form-container input[type="file"]:focus {
+    outline: none;
+    border-color: #28a745;
+    background: rgba(255,255,255,0.7);
+}
+
+/* Área de imagen actual */
+.imagen-actual {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.imagen-actual label {
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+    color: #333;
+}
+
+.imagen-preview {
+    text-align: center;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.imagen-preview img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Notas y texto de ayuda */
+.marca-form-container span[style*="font-size: 0.85em"],
+.marca-form-container p[style*="font-size: 0.9em"] {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85em !important;
+    color: #666 !important;
+    line-height: 1.4;
+}
+
+/* Contenedor de botones */
+.marca-form-buttons {
+    margin-top: 25px;
+    display: flex;
+    gap: 10px;
+}
+
+/* Botón principal (Submit) */
+.marca-form-container .btn-primary {
+    flex: 1;
+    padding: 12px 20px;
+    background: #28a745;
+    color: white;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    text-align: center;
+}
+
+.marca-form-container .btn-primary:hover {
+    background: #218838;
+}
+
+/* Botón secundario (Cancelar) */
+.marca-form-container .btn-secondary {
+    flex: 1;
+    padding: 12px 20px;
+    background: #6c757d;
+    color: white;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+}
+
+.marca-form-container .btn-secondary:hover {
+    background: #5a6268;
+}
+
+/* Mensajes de error / éxito */
+.marca-form-container .messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.marca-form-container .messages li {
+    padding: 12px 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-size: 0.95em;
+}
+
+.marca-form-container .messages li.error {
+    background-color: rgba(248, 215, 218, 0.9);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.marca-form-container .messages li.success {
+    background-color: rgba(212, 237, 218, 0.9);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* Errores de campo */
+.marca-form-container .error {
+    color: #dc3545;
+    font-size: 0.9em;
+    display: block;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+.marca-form-container .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0;
+    color: #dc3545;
+    font-size: 0.9em;
+}
+
+/* Párrafos dentro del formulario */
+.marca-form-container p {
+    margin-bottom: 15px;
+}
+
+.clean-image {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #b33a3a;
+    cursor: pointer;
+}
+.clean-image input {
+    width: 16px;
+    height: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .marca-form-container {
+        margin: 15px;
+        padding: 20px;
+    }
+    
+    .marca-form-section {
+        padding: 15px;
+    }
+    
+    .marca-form-buttons {
+        flex-direction: column;
+    }
+    
+    .marca-form-container .btn-primary,
+    .marca-form-container .btn-secondary {
+        width: 100%;
+    }
+}

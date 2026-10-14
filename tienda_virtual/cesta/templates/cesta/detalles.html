@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/cesta.css' %}">
+
+<div class="container mt-4">
+
+    <div class="row">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3">
+                <h4 class="mb-3 text-center">Resumen de tu compra</h4>
+
+                <ul class="list-group mb-3">
+                    {% for item in resumen %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ item.nombre }}</strong><br>
+                                Cantidad: {{ item.cantidad }}
+                            </div>
+                            <span>{{ item.subtotal }} €</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <h4 class="text-center mt-3">
+                    Total: <strong>{{ total_final }} €</strong>
+                </h4>
+
+                
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <h3 class="mb-4">Productos en tu cesta</h3>
+
+            {% if items %}
+                {% for item in items %}
+                    <div class="card mb-3 shadow-sm p-3">
+                        <div class="row g-0 align-items-center">
+                            
+                            <!-- Imagen -->
+                            <div class="col-md-3 text-center">
+                                {% if item.producto.es_personalizable %}
+                                    <img src="{{ item.preview_url }}" alt="Preview de la personalización" style="max-height: 120px;">
+                                {% else %}
+                                    <img src="{{ item.producto.imagen_principal.url }}" 
+                                     class="img-fluid rounded" style="max-height: 120px;">
+                                {% endif %}
+                            </div>
+
+                            <!-- Información -->
+                            <div class="col-md-6">
+                                <h5>{{ item.producto.nombre }}</h5>
+                                <p class="mb-1">Talla: <strong>{{ item.talla.talla }}</strong></p>
+                                <p class="mb-1">Precio unidad: {{ item.producto.precio }} €</p>
+                                <p class="mb-1">Subtotal: <strong>{{ item.subtotal }} €</strong></p>
+                            </div>
+
+                            <!-- Cambiar cantidad -->
+                            <div class="col-md-3">
+
+                                <form method="post" action="{% url 'actualizar_cantidad_cesta' %}">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="key" value="{{ item.key }}">
+                                  <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" class="form-control" style="width: 70px; display:inline-block;">
+                                  <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
+                                </form>
+
+                                <form method="post" action="{% url 'eliminar_item_cesta' %}">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="key" value="{{ item.key }}">
+                                  <button type="submit" class="btn btn-sm btn-danger mt-2">Eliminar</button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="row gap-2 mt-3 mb-3">
+                    <div class="col-md-6">
+                        <a href="{% url 'catalogo' %}" class="btn btn-secondary btn-block w-100">
+                            Seguir comprando
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <form method="get" action="{% url 'checkout' %}" style="width: 100%;">
+                            <button type="submit" class="btn btn-success btn-block w-100">
+                                Finalizar compra
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-muted">Tu cesta está vacía.</p>
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

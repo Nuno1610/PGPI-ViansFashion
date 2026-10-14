@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+<link rel="stylesheet" href="{% static 'css/rangoprecios.css' %}">
+
+<div class="catalogo-container">
+  <!-- BARRA DE BÚSQUEDA -->
+  <div class="search-bar-top">
+    <form method="GET" action="" class="search-form-top">
+      <div class="search-input-wrap-top">
+        <input id="buscar-nombre" type="text" name="nombre" placeholder="Buscar por nombre" value="{{ search_nombre }}" class="search-input-top">
+        <button type="submit" class="search-button-top">Buscar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- FILTROS Y PRODUCTOS -->
+  <div class="catalog-layout">
+    <!-- COLUMNA DE FILTROS -->
+    <aside class="filters-column">
+      <form method="GET" action="" class="filters-form">
+        {% if search_nombre %}<input type="hidden" name="nombre" value="{{ search_nombre }}">{% endif %}
+
+        <!-- FILTRO POR CATEGORÍAS -->
+        <div class="filter-box">
+          <h2>Categorías</h2>
+          {% if request.user.is_superuser %}
+            <a href="{% url 'crear_categoria' %}" class="btn-crear">+ Crear categoría</a>
+          {% endif %}
+          <div class="categoria-card">
+            <a href="{% url 'catalogo' %}">Todas</a>
+          </div>
+          {% for categoria in categorias %}
+            <div class="categoria-card {% if categoria_actual and categoria_actual.id == categoria.id %}active{% endif %}">
+              <a href="{% url 'catalogo_categoria' categoria.slug %}">{{ categoria.nombre }}</a>
+              {% if request.user.is_superuser %}
+                <div class="admin-options">
+                  <a href="{% url 'editar_categoria' categoria.id %}" class="btn btn-editar">✎ Editar</a>
+                  <a href="{% url 'eliminar_categoria' categoria.id %}" class="btn btn-eliminar" onclick="return confirm('¿Eliminar esta categoría?');">🗑 Eliminar</a>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- FILTRO POR GÉNERO -->
+        <div class="filter-box">
+          <h2>Género</h2>
+          <select id="buscar-genero" name="genero" class="filter-select">
+            <option value="" {% if not search_genero %}selected{% endif %}>Todos</option>
+            <option value="H" {% if search_genero == 'H' %}selected{% endif %}>Hombre</option>
+            <option value="M" {% if search_genero == 'M' %}selected{% endif %}>Mujer</option>
+            <option value="U" {% if search_genero == 'U' %}selected{% endif %}>Unisex</option>
+            <option value="K" {% if search_genero == 'K' %}selected{% endif %}>Kids</option>
+          </select>
+          <button type="submit" class="filter-button">Aplicar</button>
+        </div>
+
+        <!-- Filtro de marca -->
+        <div class="filter-box">
+          <h2>Marcas</h2>
+          {% if request.user.is_superuser %}
+            <a href="{% url 'crear_marca' %}" class="btn-crear">+ Crear marca</a>
+          {% endif %}
+          <div class="categoria-card {% if not search_marca %}active{% endif %}">
+            <a href="?{% if search_genero %}genero={{ search_genero }}&{% endif %}{% if search_nombre %}nombre={{ search_nombre }}&{% endif %}{% if search_precio_min %}precio_min={{ search_precio_min }}&{% endif %}{% if search_precio_max %}precio_max={{ search_precio_max }}{% endif %}">Todas</a>
+          </div>
+          {% for marca in marcas %}
+            <div class="categoria-card {% if search_marca == marca.id|stringformat:"s" %}active{% endif %}">
+              <a href="?marca={{ marca.id }}{% if search_genero %}&genero={{ search_genero }}{% endif %}{% if search_nombre %}&nombre={{ search_nombre }}{% endif %}{% if search_precio_min %}&precio_min={{ search_precio_min }}{% endif %}{% if search_precio_max %}&precio_max={{ search_precio_max }}{% endif %}">{{ marca.nombre }}</a>
+              {% if request.user.is_superuser %}
+                <div class="admin-options">
+                  <a href="{% url 'editar_marca' marca.id %}" class="btn btn-editar">✎ Editar</a>
+                  <a href="{% url 'eliminar_marca' marca.id %}" class="btn btn-eliminar" onclick="return confirm('¿Eliminar esta marca?');">🗑 Eliminar</a>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- FILTRO POR PRECIOS -->
+        <div class="filter-box">
+          <h2>Rango de precios</h2>
+          <div class="price-values">
+            <div class="price-box"><span class="amount" id="precio-min-val">{{ search_precio_min|default:precio_bound_min }}</span>€</div>
+            <div class="price-dash">-</div>
+            <div class="price-box"><span class="amount" id="precio-max-val">{{ search_precio_max|default:precio_bound_max }}</span>€</div>
+          </div>
+          <div class="liquid-glass-slider" id="price-slider">
+            <div class="track-container">
+              <div class="range-fill"></div>
+            </div>
+            <input id="precio-min-range" class="active" type="range" name="precio_min" min="{{ precio_bound_min }}" max="{{ precio_bound_max }}" step="0.01" value="{{ search_precio_min|default:precio_bound_min }}">
+            <input id="precio-max-range" class="active" type="range" name="precio_max" min="{{ precio_bound_min }}" max="{{ precio_bound_max }}" step="0.01" value="{{ search_precio_max|default:precio_bound_max }}">
+          </div>
+          <button type="submit" class="filter-button">Aplicar</button>
+        </div>
+      </form>
+    </aside>
+
+    <!-- COLUMNA CON LOS PRODUCTOS -->
+    <main class="catalog-main">
+
+      {% if request.user.is_superuser %}
+        <div class="mb-3 text-end">
+          <a href="{% url 'crear_producto' %}" class="btn btn-success">
+            + Crear producto
+          </a>
+        </div>
+      {% endif %}
+
+      <!-- GRID DE PRODUCTOS -->
+      <section class="productos-grid">
+        {% for producto in productos %}
+          <div class="producto-card">
+            {% if producto.stock_total > 0 %}
+              <span class="badge stock">En Stock</span>
+            {% else %}
+              <span class="badge sin-stock">Sin stock</span>
+            {% endif %}
+            {% if producto.es_personalizable %}
+                <span class="badge personalizable">Personalizable</span>
+            {% endif %}
+            <img src="{{ producto.imagen_principal.url }}" class="producto-img">
+            <h4>
+              <a href="{% url 'detalle_producto' producto.id %}">{{ producto.nombre }}</a>
+            </h4>
+            <p class="precio">{{ producto.precio }}€</p>
+          </div>
+        {% endfor %}
+
+      </section>
+    </main>
+  </div>
+</div>
+  <script src="{% static 'js/rangoprecios.js' %}"></script>
+{% endblock %}

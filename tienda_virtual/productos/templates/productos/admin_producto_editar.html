@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/formulario_admin_producto.css' %}">
+
+<div class="admin-form-container">
+  <h2>{{ accion }} Producto: {{ producto.nombre }}</h2>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- PRODUCTO -->
+    <fieldset class="form-section">
+        <legend>Datos del producto</legend>
+        
+        {% for field in form %}
+          {% if field.name != 'es_personalizable' %}
+            <p>
+              {{ field.label_tag }}
+              {{ field }}
+              {% if field.errors %}
+                <span class="error">{{ field.errors }}</span>
+              {% endif %}
+            </p>
+          {% endif %}
+        {% endfor %}
+        
+        <!-- Mostrar es_personalizable como solo lectura -->
+        <p>
+          <label>Producto personalizable:</label>
+          <strong>{% if producto.es_personalizable %}Sí{% else %}No{% endif %}</strong>
+          <input type="hidden" name="es_personalizable" value="{{ producto.es_personalizable }}">
+        </p>
+    </fieldset>
+
+    <!-- IMÁGENES -->
+    <fieldset class="form-section">
+      <legend>Imágenes del producto</legend>
+      {{ imagen_formset.non_form_errors }}
+      
+      <div id="imagen_set-container">
+        {{ imagen_formset.management_form }}
+        {% for form in imagen_formset %}
+          <div class="formset-item">
+            {{ form.id }}
+            
+            {% if form.instance.imagen %}
+              <div class="imagen-preview">
+                <img src="{{ form.instance.imagen.url }}" alt="Imagen" style="max-width: 150px; border-radius: 8px;">
+                {% if form.instance.es_principal %}
+                  <span class="badge-principal">Principal</span>
+                {% endif %}
+              </div>
+            {% endif %}
+            
+            <p>
+              {{ form.imagen.label_tag }}
+              {{ form.imagen }}
+            </p>
+            
+            <p>
+              {{ form.color.label_tag }}
+              {{ form.color }}
+            </p>
+            
+            <p>
+              {{ form.es_principal }}
+              <label for="{{ form.es_principal.id_for_label }}">{{ form.es_principal.label }}</label>
+            </p>
+            
+            {{ form.DELETE }}
+            
+            <button type="button" class="remove-form-btn">Eliminar</button>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Empty form oculto -->
+      <div id="imagen_set-empty" style="display:none;">
+        <div class="formset-item">
+          {{ imagen_formset.empty_form.as_p }}
+          <button type="button" class="remove-form-btn">Eliminar</button>
+        </div>
+      </div>
+
+      <button type="button" id="add-imagen-btn" class="btn-secondary">Añadir otra imagen</button>
+    </fieldset>
+
+    <!-- TALLAS -->
+    <fieldset class="form-section">
+        <legend>Tallas del producto</legend>
+        {{ talla_formset.non_form_errors }}
+        
+        <div id="talla_set-container">
+            {{ talla_formset.management_form }}
+            {% for form in talla_formset %}
+                <div class="formset-item">
+                    {{ form.id }}
+                    
+                    <p>
+                      {{ form.talla.label_tag }}
+                      {{ form.talla }}
+                    </p>
+                    
+                    <p>
+                      {{ form.stock.label_tag }}
+                      {{ form.stock }}
+                    </p>
+                    
+                    {{ form.DELETE }}
+                    
+                    <button type="button" class="remove-form-btn">Eliminar</button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Empty form oculto -->
+        <div id="talla_set-empty" style="display:none;">
+            <div class="formset-item">
+              {{ talla_formset.empty_form.as_p }}
+              <button type="button" class="remove-form-btn">Eliminar</button>
+            </div>
+        </div>
+
+        <button type="button" id="add-talla-btn" class="btn-secondary">Añadir otra talla</button>
+    </fieldset>
+
+    <div style="margin-top: 20px;">
+      <button type="submit" class="btn-primary">Confirmar</button>
+      <a href="{% url 'catalogo' %}" class="btn-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    function addForm(containerId, emptyId, totalFormsId) {
+        const container = document.getElementById(containerId);
+        const emptyForm = document.getElementById(emptyId);
+        const totalForms = document.getElementById(totalFormsId);
+
+        if (!container || !emptyForm || !totalForms) {
+            console.error('No se encontraron los elementos:', {containerId, emptyId, totalFormsId});
+            return;
+        }
+
+        const currentCount = parseInt(totalForms.value);
+        
+        // Clonar el div interno del empty form
+        const emptyFormContent = emptyForm.querySelector('.formset-item');
+        if (!emptyFormContent) {
+            console.error('No se encontró formset-item dentro de empty form');
+            return;
+        }
+        
+        const newFormDiv = emptyFormContent.cloneNode(true);
+        
+        // Reemplazar __prefix__ por el número actual en todo el HTML
+        newFormDiv.innerHTML = newFormDiv.innerHTML.replace(/__prefix__/g, currentCount);
+
+        container.appendChild(newFormDiv);
+        totalForms.value = currentCount + 1;
+    }
+
+    // Botones de añadir
+    document.getElementById("add-imagen-btn")?.addEventListener("click", () => {
+        addForm("imagen_set-container", "imagen_set-empty", "id_imagen-TOTAL_FORMS");
+    });
+    
+    document.getElementById("add-talla-btn")?.addEventListener("click", () => {
+        addForm("talla_set-container", "talla_set-empty", "id_talla-TOTAL_FORMS");
+    });
+
+    // Botones de eliminar
+    document.addEventListener("click", function(e) {
+        if (e.target && e.target.classList.contains("remove-form-btn")) {
+            const formDiv = e.target.closest(".formset-item");
+            const deleteInput = formDiv.querySelector(`input[type="checkbox"][name$='-DELETE']`);
+            if (deleteInput) {
+                deleteInput.checked = true;
+                formDiv.style.display = 'none';
+            } else {
+                formDiv.remove();
+                // Actualizar TOTAL_FORMS si no hay input DELETE
+                const fieldset = formDiv.closest("fieldset");
+                let prefix = '';
+                if (fieldset.querySelector('#imagen_set-container')) {
+                    prefix = 'imagen';
+                } else if (fieldset.querySelector('#talla_set-container')) {
+                    prefix = 'talla';
+                }
+                if (prefix) {
+                    const totalForms = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
+                    if (totalForms) {
+                        totalForms.value = parseInt(totalForms.value) - 1;
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+
+<style>
+.imagen-preview {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.badge-principal {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #28a745;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 0.9em;
+  display: block;
+  margin-top: 5px;
+}
+</style>
+
+{% endblock %}

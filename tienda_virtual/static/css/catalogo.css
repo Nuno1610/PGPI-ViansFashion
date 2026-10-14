@@ -1,0 +1,244 @@
+.catalogo-container {
+    display: flex;
+    gap: 40px;
+    padding: 30px;
+    flex-wrap: wrap;
+}
+
+/* Panel lateral */
+.side-menu {
+    width: 20%;
+    min-width: 200px;
+    padding: 25px 20px;
+    background: rgba(126, 121, 121, 0.1);   
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.side-menu h3 {
+    margin-bottom: 20px;
+}
+
+.categoria-item {
+    margin: 10px 0;
+    font-size: 1.1em;
+    width: 25%
+}
+
+.categoria-item:hover {
+    font-weight: bold;
+}
+
+.categoria-item a {
+    color: black;
+    text-decoration: none;
+}
+
+.categoria-item.active a {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+
+.productos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    justify-items: center;  
+    gap: 40px;
+}
+
+.producto-card {
+    position: relative;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    text-align: center;
+    backdrop-filter: blur(6px);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    /* Resaltar la card */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.producto-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+}
+
+.producto-img {
+    width: 100%;
+    max-width: 100%;
+    height: 350px;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+    
+    /* Fondo con gradiente de gris */
+    background: linear-gradient(to bottom, #e0e0e0, #9d9c9c);
+    border-radius: 15px;
+}
+
+.precio {
+    margin-top: 10px;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+/* Badges */
+.badge {
+    position: absolute;
+    top: 10px;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.8em;
+}
+
+.stock {
+    background: #4CAF50;
+    color: white;
+    left: 10px;
+}
+
+.sin-stock {
+    background: #e74c3c;
+    color: white;
+    left: 10px;
+}
+
+.personalizable {
+    background: #1dd6d6;
+    color: white;
+    right: 10px;
+}
+
+/* Producto personalizable */
+.custom-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.custom-btn {
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.20);
+    border-radius: 50%;
+    font-size: 2em;
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+}
+
+/* Botón crear categoría */
+.btn-crear {
+    display: inline-block;
+    padding: 8px 12px;
+    background: #28a745;
+    color: #ffff;
+    border-radius: 12px;
+    width: 100%;
+    text-align:center;
+    font-size: 0.9em;
+    font-weight: bold;
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: background 0.2s;
+}
+
+.btn-crear:hover {
+    background: #218838;
+    text-decoration: none;
+    color: #ffff;
+}
+
+/* Grid de categorías */
+.categorias-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* Card individual de categoría */
+.categoria-card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top:5%
+}
+
+.categoria-card.active {
+    border: 2px solid #28a745; 
+    background: rgba(255, 255, 255, 0.2); 
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); 
+    transform: translateY(-2px); 
+}
+
+.categoria-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.25);
+}
+
+/* Título de la categoría */
+.categoria-card h4 {
+    font-size: 1em;
+    margin: 5px 0;
+}
+
+.categoria-card a {
+    text-decoration: none;
+    color: black;
+}
+
+.categoria-card a:hover {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+/* Botones de editar y eliminar */
+.admin-options {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.btn-editar, .btn-eliminar {
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 0.75em;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-editar {
+    background: #ffc107;
+    color: #212529;
+}
+
+.btn-editar:hover {
+    background: #e0a800;
+}
+
+.btn-eliminar {
+    background: #dc3545;
+    color: #fff;
+}
+
+.btn-eliminar:hover {
+    background: #c82333;
+}

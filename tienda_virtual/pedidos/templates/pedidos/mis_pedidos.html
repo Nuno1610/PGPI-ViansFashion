@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- Título -->
+    <h2 class="fw-bold mb-4">Mis pedidos</h2>
+
+    <!-- Tabla -->
+    <div class="table-responsive shadow-sm rounded-3">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Nº Pedido</th>
+                    <th>Precio total</th>
+                    <th>Estado</th>
+                    <th class="text-end"></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for pedido in pedidos %}
+                <tr>
+                    <td>{{ pedido.fecha_creacion|date:"d/m/Y" }}</td>
+
+                    <td class="fw-semibold">{{ pedido.numero_pedido }}</td>
+
+                    <td>
+                        {{ pedido.total|floatformat:2 }} €
+                    </td>
+
+                    <td>
+                        {% if pedido.estado == "ENRV" %}
+                            <span class="badge bg-secondary">En revisión</span>
+                        {% elif pedido.estado == "PROC" %}
+                            <span class="badge bg-warning text-dark">Procesando</span>
+                        {% elif pedido.estado == "ENVI" %}
+                            <span class="badge bg-info text-dark">Enviado</span>
+                        {% elif pedido.estado == "ENTR" %}
+                            <span class="badge bg-success">Entregado</span>
+                        {% elif pedido.estado == "CANC" %}
+                            <span class="badge bg-danger">Cancelado</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="text-end">
+                        <!-- Botón Ver detalles -->
+                        <a href="{% url 'detalle_pedido' pedido.numero_pedido %}" 
+                            class="btn btn-sm btn-primary me-2">
+                            Ver detalles
+                        </a>
+
+                        <!-- Botón Seguimiento del pedido -->
+                        <a href="{% url 'seguimiento_pedido' pedido.numero_pedido %}" 
+                            class="btn btn-sm btn-secondary">
+                            Seguimiento
+                        </a>
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4">
+                        Todavía no tienes pedidos realizados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+{% endblock %}

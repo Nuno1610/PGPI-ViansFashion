@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Factura de tu compra</title>
+  <style>
+    body {
+      font-family: "Helvetica", Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 650px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 25px;
+    }
+    .header {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .header img {
+      max-height: 60px;
+    }
+    h2 {
+      color: #333;
+      margin-top: 20px;
+    }
+    .summary {
+      margin: 20px 0;
+    }
+    .summary p {
+      margin: 5px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .total {
+      text-align: right;
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-top: 10px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #ff9900;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+    .footer {
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h3>Vians Fashion<h3>
+    </div>
+
+    <h2>Factura de tu compra #{{ pedido.numero_pedido }}</h2>
+
+    <div class="summary">
+      <p><strong>Cliente:</strong> {{ pedido.nombre_cliente }}</p>
+      <p><strong>Email:</strong> {{ pedido.email }}</p>
+      <p><strong>Dirección:</strong> {{ pedido.direccion_envio }}</p>
+      <p><strong>Teléfono:</strong> {{ pedido.telefono }}</p>
+      <p><strong>Fecha:</strong> {{ pedido.fecha_creacion }}</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>{{ item.producto.nombre }}</td>
+          <td>{{ item.cantidad }}</td>
+          <td>{{ item.total }} €</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p class="total">Importe total: {{ pedido.total }} €</p>
+
+    <p>¡Gracias por confiar en Vians Fashion! Esperamos verte pronto.</p>
+
+    <div class="footer">
+      Vians Fashion · Tu tienda online de moda<br>
+      No respondas a este correo. Si tienes dudas, contáctanos en contacto@viansfashion.com
+    </div>
+  </div>
+</body>
+</html>

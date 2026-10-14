@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/detalle_producto.css' %}">
+<link rel="stylesheet" href="{% static 'css/detalle_personalizado.css' %}">
+
+<div class="producto-detalle-container">
+
+  <!-- COLUMNA IZQUIERDA (PREVISUALIZACIÓN) -->
+  <div class="imagen-section-custom" style="position:relative;">
+    <!-- Imagen por defecto -->
+    <img id="imagen-principal" src="{{ producto.imagen_principal.url }}" class="producto-detalle-img">
+
+    <!-- Imagen de personalización -->
+    <img id="imagen-preview" src="" draggable="false">
+
+    <!-- Texto de personalización -->
+    <div id="texto-preview"></div>
+
+    <!-- MINIATURAS -->
+    <div class="miniaturas-container">
+      {% for img in producto.imagenes.all %}
+        {% if user.is_staff%}
+          <img 
+            class="miniatura {% if forloop.first %}active{% endif %}" 
+            src="{{ img.imagen.url }}" 
+            data-full="{{ img.imagen.url }}"
+            data-color="{{ img.color }}"
+          >
+        {% else %}
+          <img 
+            class="miniatura {% if forloop.first %}active{% endif %} no-clickable" 
+            src="{{ img.imagen.url }}" 
+            data-full="{{ img.imagen.url }}"
+            data-color="{{ img.color }}"
+          >
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- COLUMNA DERECHA (FORMULARIO) -->
+  <div class="info-section">
+    <h2>Personalizando: {{ producto.nombre }}</h2>
+    
+    <p class="precio">{{ producto.precio }}€</p>
+
+    {% if not user.is_staff %}
+    
+      <form method="post" enctype="multipart/form-data" class="form-carrito">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <!-- SELECTOR DE TALLA -->
+        {% if producto.stock_total > 0 %}
+          <label for="talla">Talla:</label>
+          <select id="talla" name="talla" class="selector-talla">
+          {% for t in producto.tallas.all %}
+            <option 
+              value="{{ t.id }}" 
+              {% if t.stock == 0 %}disabled class="sin-stock"{% endif %}
+            >
+              {{ t.talla }} — 
+                {% if t.stock > 0 %}
+                  En stock
+              {% else %}
+                  Sin stock
+              {% endif %}
+            </option>
+          {% endfor %}
+                </select>
+        {% endif %}
+
+        <!-- Inputs ocultos para posiciones -->
+        <input type="hidden" name="texto_x" id="texto_x">
+        <input type="hidden" name="texto_y" id="texto_y">
+        <input type="hidden" name="imagen_x" id="imagen_x">
+        <input type="hidden" name="imagen_y" id="imagen_y">
+        <input type="hidden" name="preview_width" id="preview_width">
+        <input type="hidden" name="preview_height" id="preview_height">
+        
+        <button type="submit" class="btn-carrito">Guardar y continuar</button>
+      </form>
+
+  {% endif %}
+  {% if user.is_staff %}
+        <div class="admin-actions">
+            <form method="post" action="{% url 'reponer_stock' producto.id %}">
+                {% csrf_token %}
+                <label for="talla-reponer">Talla:</label>
+                <select id="talla-reponer" name="talla_id">
+                    {% for t in producto.tallas.all %}
+                        <option value="{{ t.id }}">
+                            {{ t.talla }} — {{ t.stock }} en stock
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="cantidad-reponer">Cantidad a reponer:</label>
+                <input type="number" id="cantidad-reponer" name="cantidad" min="1" value="1">
+
+                <button type="submit" class="btn-admin mt-2">Reponer stock</button>
+            </form>
+
+            {% if user.is_staff %}
+              <a href="{% url 'editar_producto_admin' producto.id %}" class="btn btn-warning mt-2">
+                Editar producto
+              </a>
+            {% endif %}
+
+            <form method="post" action="{% url 'eliminar_producto' producto.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-admin btn-danger mt-2 mb-2">Eliminar producto</button>
+            </form>
+        </div>
+  {% endif %}
+  </div>
+
+  {% if not user.is_staff %}
+      {% if producto.es_personalizable %}
+        <div id="aviso">
+          <p>Puedes mover la imagen y el texto que añadas. Asegura que estén contenidos en el producto</p>
+        </div>
+      {% endif %}
+    {% endif %}
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const contenedor = document.querySelector(".imagen-section-custom");
+  const textoPreview = document.getElementById("texto-preview");
+  const imagenPreview = document.getElementById("imagen-preview");
+  const inputTexto = document.getElementById("id_texto");
+  const inputColor = document.getElementById("id_color_texto");
+  const inputImagen = document.getElementById("id_imagen");
+  const inputColorProducto = document.getElementById("id_color_producto");
+  const imagenPrincipal = document.getElementById("imagen-principal");
+  const miniaturas = document.querySelectorAll(".miniatura");
+  const form = document.querySelector(".form-carrito");
+
+  const textoInicial = inputTexto ? inputTexto.value : "";
+
+  // Inputs ocultos
+  const inputTextoX = document.getElementById("texto_x");
+  const inputTextoY = document.getElementById("texto_y");
+  const inputImagenX = document.getElementById("imagen_x");
+  const inputImagenY = document.getElementById("imagen_y");
+  const inputPreviewWidth = document.getElementById("preview_width");
+  const inputPreviewHeight = document.getElementById("preview_height");
+
+  // Función para actualizar el tamaño del preview
+  function actualizarTamanoPreview() {
+    inputPreviewWidth.value = imagenPrincipal.clientWidth;
+    inputPreviewHeight.value = imagenPrincipal.clientHeight;
+  }
+
+  // Actualizar tamaño cuando carga la imagen
+  imagenPrincipal.addEventListener("load", actualizarTamanoPreview);
+  
+  // Actualizar tamaño inicial
+  if (imagenPrincipal.complete) {
+    actualizarTamanoPreview();
+  }
+
+  function hacerArrastrable(elemento, contenedor, inputX, inputY) {
+    let offsetX = 0;
+    let offsetY = 0;
+    let moviendo = false;
+
+    elemento.addEventListener("mousedown", function(e) {
+      moviendo = true;
+      offsetX = e.clientX - elemento.offsetLeft;
+      offsetY = e.clientY - elemento.offsetTop;
+      e.preventDefault();
+    });
+
+    document.addEventListener("mousemove", function(e) {
+      if (!moviendo) return;
+
+      let left = e.clientX - offsetX;
+      let top = e.clientY - offsetY;
+
+      const maxLeft = contenedor.clientWidth - elemento.offsetWidth;
+      const maxTop = contenedor.clientHeight - elemento.offsetHeight;
+
+      left = Math.max(0, Math.min(left, maxLeft));
+      top = Math.max(0, Math.min(top, maxTop));
+
+      elemento.style.left = left + "px";
+      elemento.style.top = top + "px";
+
+      // Actualizar inputs ocultos
+      if (inputX && inputY) {
+        inputX.value = left;
+        inputY.value = top;
+      }
+    });
+
+    document.addEventListener("mouseup", function() {
+      moviendo = false;
+    });
+  }
+
+  if (textoPreview) {
+    textoPreview.style.position = "absolute";
+    textoPreview.style.top = "20px";
+    textoPreview.style.left = "20px";
+    textoPreview.style.cursor = "move";
+    textoPreview.innerText = textoInicial;
+    hacerArrastrable(textoPreview, contenedor, inputTextoX, inputTextoY);
+    inputTextoX.value = "20";
+    inputTextoY.value = "20";
+  }
+
+  if (imagenPreview) {
+    imagenPreview.style.position = "absolute";
+    imagenPreview.style.top = "40px";
+    imagenPreview.style.left = "40px";
+    imagenPreview.style.cursor = "move";
+    imagenPreview.style.display = "none";
+    hacerArrastrable(imagenPreview, contenedor, inputImagenX, inputImagenY);
+    inputImagenX.value = "40";
+    inputImagenY.value = "40";
+  }
+
+  inputTexto?.addEventListener("input", e => textoPreview.textContent = e.target.value);
+
+  inputColor?.addEventListener("input", e => {
+    textoPreview.style.color = e.target.value;
+  });
+
+  inputColorProducto?.addEventListener("change", function(e) {
+    const colorElegido = e.target.value;
+    miniaturas.forEach(thumb => {
+      if (thumb.dataset.color.toLowerCase() === colorElegido.toLowerCase()) {
+        imagenPrincipal.src = thumb.dataset.full;
+        miniaturas.forEach(t => t.classList.remove("active"));
+        thumb.classList.add("active");
+      }
+    });
+  });
+
+  inputImagen?.addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      imagenPreview.src = ev.target.result;
+      imagenPreview.style.display = "block";
+    }
+    reader.readAsDataURL(file);
+  });
+  
+  // --- Miniaturas clickables (SOLO PARA ADMIN) ---
+    const principal = document.getElementById("imagen-principal");
+    const minis = document.querySelectorAll(".miniatura:not(.no-clickable)");
+
+    if (principal && minis.length > 0) {
+        minis.forEach(mini => {
+            mini.addEventListener("click", () => {
+                // Cambiar la imagen principal al src de la miniatura
+                principal.src = mini.src;
+
+                // Cambiar clase active
+                minis.forEach(m => m.classList.remove("active"));
+                mini.classList.add("active");
+
+                // Añadir feedback visual
+                mini.style.transform = "scale(1.05)";
+                setTimeout(() => {
+                    mini.style.transform = "";
+                }, 200);
+            });
+
+            // Hacer cursor pointer en las miniaturas clickables
+            mini.style.cursor = "pointer";
+        });
+    }
+
+    // Para usuarios no admin, establecer cursor normal
+    const minisNoClickable = document.querySelectorAll(".miniatura.no-clickable");
+    minisNoClickable.forEach(mini => {
+        mini.style.cursor = "default";
+    });
+});
+</script>
+
+{% endblock %}

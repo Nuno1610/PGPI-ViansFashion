@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/formulario_admin_producto.css' %}">
+
+<div class="admin-form-container">
+  <h2>{{ accion }} Producto</h2>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- PRODUCTO -->
+    <fieldset class="form-section">
+        <legend>Datos del producto</legend>
+        {{ form.as_p }}
+        <div class="form-group checkbox-group"> 
+            <label for="es_personalizable">Es personalizable:</label> 
+            <input type="checkbox" name="es_personalizable" id="es_personalizable" {% if producto_personalizable %}checked{% endif %}> 
+        </div>
+    </fieldset>
+
+  <!-- IMÁGENES -->
+  <fieldset class="form-section">
+    <legend>Imágenes</legend>
+    {{ imagen_formset.non_form_errors }}
+    <div id="imagen_set-container">
+      {{ imagen_formset.management_form }}
+      {% for form in imagen_formset %}
+        <div class="formset-item">
+            {{ form.as_p }}
+            {% if form.instance.pk %}
+                {{ form.DELETE }}
+            {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Empty form oculto -->
+    <div id="imagen_set-empty" style="display:none;">
+      {{ imagen_formset.empty_form.as_p }}
+      <button type="button" class="remove-form-btn">Eliminar</button>
+    </div>
+
+    <button type="button" id="add-imagen-btn" class="btn btn-secondary">Añadir otra imagen</button>
+  </fieldset>
+
+    <!-- TALLAS -->
+    <fieldset class="form-section">
+        <legend>Tallas</legend>
+        {{ talla_formset.non_form_errors }}
+        <div id="talla_set-container">
+            {{ talla_formset.management_form }}
+            {% for form in talla_formset %}
+                <div class="formset-item">
+                    {{ form.as_p }}
+                    {% if form.instance.pk %}
+                        {{ form.DELETE }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Empty form oculto -->
+        <div id="talla_set-empty" style="display:none;">
+            {{ talla_formset.empty_form.as_p }}
+            <button type="button" class="remove-form-btn">Eliminar</button>
+        </div>
+
+        <button type="button" id="add-talla-btn" class="btn btn-secondary">Añadir otra talla</button>
+    </fieldset>
+
+    <button type="submit" class="btn btn-primary">{{ accion }} Producto</button>
+    <a href="{% url 'catalogo' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    function addForm(containerId, emptyId, totalFormsId) {
+        const container = document.getElementById(containerId);
+        const emptyForm = document.getElementById(emptyId);
+        const totalForms = document.getElementById(totalFormsId);
+
+        if (!container || !emptyForm || !totalForms) {
+            console.error('No se encontraron los elementos:', {containerId, emptyId, totalFormsId});
+            return;
+        }
+
+        const currentCount = parseInt(totalForms.value);
+        const newFormDiv = document.createElement('div');
+        newFormDiv.classList.add('formset-item');
+
+        // Reemplazar __prefix__ por el número actual
+        newFormDiv.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, currentCount);
+
+        container.appendChild(newFormDiv);
+        totalForms.value = currentCount + 1;
+    }
+
+    // Botones de añadir - CORREGIDOS los IDs
+    document.getElementById("add-imagen-btn").addEventListener("click", () => {
+        addForm("imagen_set-container", "imagen_set-empty", "id_imagen-TOTAL_FORMS");
+    });
+    
+    document.getElementById("add-talla-btn").addEventListener("click", () => {
+        addForm("talla_set-container", "talla_set-empty", "id_talla-TOTAL_FORMS");
+    });
+
+    // Botones de eliminar
+    document.addEventListener("click", function(e) {
+        if (e.target && e.target.classList.contains("remove-form-btn")) {
+            const formDiv = e.target.closest(".formset-item");
+            const deleteInput = formDiv.querySelector(`input[type="checkbox"][name$='-DELETE']`);
+            if (deleteInput) {
+                deleteInput.checked = true;
+                formDiv.style.display = 'none';
+            } else {
+                formDiv.remove();
+                // Actualizar TOTAL_FORMS si no hay input DELETE
+                const fieldset = formDiv.closest("fieldset");
+                let prefix = '';
+                if (fieldset.querySelector('#imagen_set-container')) {
+                    prefix = 'imagen';
+                } else if (fieldset.querySelector('#talla_set-container')) {
+                    prefix = 'talla';
+                }
+                if (prefix) {
+                    const totalForms = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
+                    if (totalForms) {
+                        totalForms.value = parseInt(totalForms.value) - 1;
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+{% endblock %}

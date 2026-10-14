@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- Título -->
+    <h2 class="fw-bold mb-4">Seguimiento del pedido</h2>
+
+    <!-- Nº Pedido -->
+    <div class="mb-4">
+        <span class="text-muted">Pedido:</span>
+        <span class="fw-semibold">{{ pedido.numero_pedido }}</span>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="tracking-container mb-5">
+
+        <div class="steps">
+
+            <!-- EN REVISIÓN -->
+            <div class="step {% if pedido.estado in 'ENRV PROC ENVI ENTR' %} active {% endif %}">
+                <div class="step-icon">1</div>
+                <div class="step-title">En revisión</div>
+            </div>
+
+            <!-- PROCESANDO -->
+            <div class="step {% if pedido.estado in 'PROC ENVI ENTR' %} active {% endif %}">
+                <div class="step-icon">2</div>
+                <div class="step-title">Procesando</div>
+            </div>
+
+            <!-- ENVIADO -->
+            <div class="step {% if pedido.estado in 'ENVI ENTR' %} active {% endif %}">
+                <div class="step-icon">3</div>
+                <div class="step-title">Enviado</div>
+            </div>
+
+            <!-- ENTREGADO -->
+            <div class="step {% if pedido.estado == 'ENTR' %} active {% endif %}">
+                <div class="step-icon">4</div>
+                <div class="step-title">Entregado</div>
+            </div>
+
+        </div>
+    </div>
+
+    {% if not request.user.is_superuser %}
+
+        <!-- Detalles del estado actual -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Estado actual</h5>
+
+                {% if pedido.estado == "ENRV" %}
+                    <p>Tu pedido está siendo revisado por nuestro equipo. Estamos verificando que toda la información sea correcta antes de continuar con el proceso. Te avisaremos en cuanto finalicemos esta revisión.
+                        ¡Gracias por tu paciencia y confianza!
+                    </p>
+
+                {% elif pedido.estado == "PROC" %}
+                    <p>Estamos preparando tu pedido con todos los detalles necesarios. Nuestro equipo está organizando los productos y gestionando el envío para que salga lo antes posible.
+                        Gracias por confiar en nosotros, ¡tu pedido estará en camino muy pronto!
+                    </p>
+
+                {% elif pedido.estado == "ENVI" %}
+                    <p>¡Tu pedido ya ha sido enviado! Está en camino hacia la dirección que nos proporcionaste.
+                        ¡Gracias por comprar con nosotros!
+                    </p>
+
+                {% elif pedido.estado == "ENTR" %}
+                    <p>¡Tu pedido ha sido entregado con éxito! Esperamos que disfrutes de tu compra
+                        ¡Gracias por elegirnos!
+                    </p>
+
+                {% elif pedido.estado == "CANC" %}
+                    <p class="text-danger">Tu pedido ha sido cancelado. Si tienes alguna consulta sobre el motivo, estaremos encantados de ayudarte.
+                        Gracias por tu comprensión
+                    </p>
+                {% endif %}
+
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if pedido.estado == "CANC" %}
+        {% if request.user.is_superuser %}
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Estado actual</h5>
+                    <p class="text-danger">Has cancelado el pedido</p>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+</div>
+
+<!-- Estilos de seguimiento -->
+<style>
+    .tracking-container {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    /* Línea de fondo */
+    .steps::before {
+        content: "";
+        position: absolute;
+        top: 22px;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: #dcdcdc;
+        z-index: 1;
+    }
+
+    .step {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        width: 100%;
+    }
+
+    /* Icono círculo */
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        background: #dcdcdc;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin: 0 auto;
+        color: #555;
+    }
+
+    .step.active .step-icon {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .step-title {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #333;
+    }
+</style>
+
+{% endblock %}

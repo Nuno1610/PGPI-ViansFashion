@@ -1,0 +1,251 @@
+/* Contenedor principal del formulario */
+.admin-form-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 30px 35px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Encabezado */
+.admin-form-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8em;
+    color: #333;
+}
+
+/* Secciones del formulario (fieldsets) */
+.form-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px);
+}
+
+.form-section legend {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    padding: 0 10px;
+}
+
+/* Items individuales del formset */
+.formset-item {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/* Campos de entrada */
+.admin-form-container input[type="text"],
+.admin-form-container input[type="number"],
+.admin-form-container input[type="file"],
+.admin-form-container textarea,
+.admin-form-container select {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.2);
+    font-size: 1em;
+    background: rgba(255,255,255,0.5);
+    color: #000;
+}
+
+.admin-form-container textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Labels */
+.admin-form-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Checkboxes */
+.admin-form-container input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+    margin-bottom: 0;
+}
+
+/* Ocultar los checkboxes DELETE y sus labels */
+input[name$='-DELETE'],
+label[for$='-DELETE'] {
+    display: none !important;
+}
+
+/* Ocultar párrafos que contienen DELETE */
+p:has(input[name$='-DELETE']) {
+    display: none !important;
+}
+
+/* Campos ocultos (ID) */
+input[type="hidden"] {
+    margin: 0;
+}
+
+/* Botones principales */
+.admin-form-container .btn-primary,
+.btn-primary {
+    display: inline-block;
+    padding: 12px 25px;
+    background: #28a745;
+    color: white;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.admin-form-container .btn-primary:hover,
+.btn-primary:hover {
+    background: #218838;
+}
+
+/* Botón secundario (Cancelar, Añadir) */
+.admin-form-container .btn-secondary,
+.btn-secondary {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #6c757d;
+    color: white;
+    font-size: 0.95em;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+
+.admin-form-container .btn-secondary:hover,
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+/* Botón añadir formset */
+#add-imagen-btn,
+#add-talla-btn {
+    margin-top: 10px;
+    background: #007bff;
+}
+
+#add-imagen-btn:hover,
+#add-talla-btn:hover {
+    background: #0056b3;
+}
+
+/* Botón eliminar */
+.remove-form-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.remove-form-btn:hover {
+    background-color: #c82333;
+}
+
+/* Mensajes de error / éxito */
+.messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.messages li {
+    padding: 12px 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-size: 0.95em;
+}
+
+.messages li.error {
+    background-color: rgba(248, 215, 218, 0.9);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.messages li.success {
+    background-color: rgba(212, 237, 218, 0.9);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* Espaciado entre párrafos del formulario */
+.admin-form-container p {
+    margin-bottom: 15px;
+}
+
+/* Preview de imagen en edición */
+.imagen-preview {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.imagen-preview img {
+    max-width: 150px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.badge-principal {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #28a745;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.error {
+    color: #dc3545;
+    font-size: 0.9em;
+    display: block;
+    margin-top: 5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-form-container {
+        margin: 15px;
+        padding: 20px;
+    }
+    
+    .form-section {
+        padding: 15px;
+    }
+    
+    .formset-item {
+        padding: 12px;
+    }
+}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Listado de clientes</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Nombre completo</th>
+      <th>Teléfono</th>
+      <th>Dirección</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cliente in clientes %}
+    <tr>
+      <td>{{ cliente.usuario.username }}</td>
+      <td>{{ cliente.usuario.email }}</td>
+      <td>{{ cliente.usuario.first_name }} {{ cliente.usuario.last_name }}</td>
+      <td>{{ cliente.telefono }}</td>
+      <td>{{ cliente.direccion }}, {{ cliente.ciudad }} {{ cliente.codigo_postal }}</td>
+      <td>
+        <a href="{% url 'eliminar_cliente' cliente.id %}" class="btn btn-danger btn-sm" 
+           onclick="return confirm('¿Seguro que quieres eliminar a este cliente?');">
+          Eliminar
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

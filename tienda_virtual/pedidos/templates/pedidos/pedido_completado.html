@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card shadow-sm p-5 text-center">
+
+        <h2 class="mb-4">¡Pedido completado!</h2>
+
+        <p class="lead">Tu pedido ha sido registrado correctamente.</p>
+
+        {% if pedido %}
+        <p>
+            Número de pedido: <strong>{{ pedido.numero_pedido }}</strong>
+        </p>
+        {% endif %}
+
+        <a href="{% url 'catalogo' %}" class="btn btn-primary mt-4">
+            Volver al catálogo
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

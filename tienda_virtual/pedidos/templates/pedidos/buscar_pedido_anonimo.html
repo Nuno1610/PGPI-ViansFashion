@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Seguimiento de Pedido - Vians Fashion{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    {% if not pedido %}
+        <!-- FORMULARIO DE BÚSQUEDA -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-5">
+                        <h2 class="card-title text-center mb-4">Seguimiento de Pedido</h2>
+                        <p class="text-center text-muted mb-4">
+                            Ingresa el número de tu pedido para ver su estado y detalles.
+                        </p>
+
+                        {% if error %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>Error:</strong> {{ error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+
+                        <form method="POST" action="{% url 'buscar_pedido_anonimo' %}">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label for="numero_pedido" class="form-label fw-bold">Número de Pedido:</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control form-control-lg" 
+                                    id="numero_pedido" 
+                                    name="numero_pedido" 
+                                    placeholder="Ej: VFF-000001"
+                                    required
+                                    autofocus
+                                >
+                                <small class="text-muted">
+                                    Lo encontrarás en el correo de confirmación de tu pedido.
+                                </small>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                                Buscar Pedido
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- INFORMACIÓN ADICIONAL -->
+                <div class="mt-5">
+                    <div class="card bg-light border-0">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold mb-3">¿Necesitas ayuda?</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>¿Dónde encuentro mi número de pedido?</strong>
+                                    <p class="text-muted small">
+                                        Te lo enviamos por correo electrónico cuando realizaste la compra.
+                                    </p>
+                                </li>
+                                <li class="mb-2">
+                                    <strong>¿Aún no recibiste el correo?</strong>
+                                    <p class="text-muted small">
+                                        Revisa tu carpeta de spam o contacta con nosotros en 
+                                        <a href="{% url 'contacto' %}">nuestro formulario de contacto</a>.
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- DETALLES DEL PEDIDO -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- ENCABEZADO DEL PEDIDO -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Pedido #{{ pedido.numero_pedido }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold text-muted">ESTADO DEL PEDIDO</h6>
+                                <p class="h5">
+                                    <span class="badge bg-info">{{ pedido.get_estado_display }}</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <h6 class="fw-bold text-muted">FECHA DE PEDIDO</h6>
+                                <p class="h5">{{ pedido.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                            </div>
+                        </div>
+
+                        <!-- DATOS DEL CLIENTE -->
+                        <hr>
+                        <h5 class="fw-bold mb-3">Datos de Envío</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Nombre:</strong> {{ pedido.nombre_cliente }}
+                                </p>
+                                <p>
+                                    <strong>Email:</strong> {{ pedido.email }}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Teléfono:</strong> {{ pedido.telefono }}
+                                </p>
+                                <p>
+                                    <strong>Dirección:</strong> {{ pedido.direccion_envio }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ITEMS DEL PEDIDO -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Artículos del Pedido</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Talla</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-end">Precio Unitario</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ item.producto.nombre }}</strong>
+                                        </td>
+                                        <td>{{ item.talla }}</td>
+                                        <td class="text-center">{{ item.cantidad }}</td>
+                                        <td class="text-end">{{ item.precio_unitario }}€</td>
+                                        <td class="text-end fw-bold">{{ item.total }}€</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- RESUMEN DE PAGO -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-6 text-end">
+                                <p class="text-muted">Subtotal:</p>
+                            </div>
+                            <div class="col-6 text-end">
+                                <p class="fw-bold">{{ pedido.subtotal }}€</p>
+                            </div>
+                        </div>
+                        {% if pedido.impuestos > 0 %}
+                            <div class="row mb-2">
+                                <div class="col-6 text-end">
+                                    <p class="text-muted">Impuestos:</p>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <p class="fw-bold">{{ pedido.impuestos }}€</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if pedido.coste_entrega > 0 %}
+                            <div class="row mb-2">
+                                <div class="col-6 text-end">
+                                    <p class="text-muted">Envío:</p>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <p class="fw-bold">{{ pedido.coste_entrega }}€</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if pedido.descuento > 0 %}
+                            <div class="row mb-2">
+                                <div class="col-6 text-end">
+                                    <p class="text-muted">Descuento:</p>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <p class="fw-bold">-{{ pedido.descuento }}€</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <hr>
+                        <div class="row">
+                            <div class="col-6 text-end">
+                                <h5 class="fw-bold">Total:</h5>
+                            </div>
+                            <div class="col-6 text-end">
+                                <h5 class="fw-bold text-primary">{{ pedido.total }}€</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTÓN PARA BUSCAR OTRO PEDIDO -->
+                <div class="text-center mb-5">
+                    <form method="GET" action="{% url 'buscar_pedido_anonimo' %}">
+                        <button type="submit" class="btn btn-outline-primary fw-bold">
+                            Buscar Otro Pedido
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
